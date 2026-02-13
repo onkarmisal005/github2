@@ -1,0 +1,124 @@
+:root{
+    --bg1:#ff9a9e; --bg2:#fad0c4; --accent:#ff6b6b; --card:#ffffffee;
+    --glass: rgba(255,255,255,0.12);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+    font-family: system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
+    background: linear-gradient(135deg,var(--bg1),var(--bg2));
+    display:flex;align-items:center;justify-content:center;
+    padding:2rem;
+    overflow:hidden;
+    color:#3a2b2b;
+}
+
+/* Card */
+.card{
+    width:min(720px,96vw);
+    background:linear-gradient(180deg,var(--card),#fff);
+    border-radius:20px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.12);
+    padding:2.2rem;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+    backdrop-filter: blur(6px);
+}
+
+h1{
+    font-size: clamp(1.6rem, 4.5vw, 2.4rem);
+    margin-bottom:.25rem;
+    letter-spacing:0.6px;
+}
+p.lead{
+    color:#6b4545;
+    margin-bottom:1.2rem;
+    font-size: clamp(.9rem,2.4vw,1.05rem);
+}
+
+/* Buttons */
+.btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
+button{
+    padding:.7rem 1.2rem;border-radius:12px;border:0;cursor:pointer;
+    font-weight:600;font-size:1rem;
+    transition:transform .18s ease, box-shadow .18s ease;
+    box-shadow:0 6px 18px rgba(0,0,0,0.08);
+    backdrop-filter: blur(4px);
+}
+.btn-yes{
+    background:linear-gradient(90deg,#ff7aa2,#ff517e);
+    color:white;
+}
+.btn-no{
+    background:transparent;border:2px solid rgba(58,43,43,0.12);
+    color:#6b4545;
+}
+button:active{transform:translateY(2px)}
+.btn-no:hover{transform:translateY(-6px) rotate(-6deg) scale(1.02)}
+
+/* Heart floats */
+.hearts{
+    pointer-events:none;
+    position:absolute;inset:0;
+    overflow:hidden;
+}
+.heart{
+    position:absolute;
+    width:36px;height:36px;
+    transform:rotate(45deg);
+    left:50%;
+    top:50%;
+    opacity:0;
+    animation:floatUp linear infinite;
+}
+.heart::before,.heart::after{
+    content:"";position:absolute;width:100%;height:100%;
+    background:radial-gradient(circle at 30% 30%,#fff7,transparent 40%),linear-gradient(135deg,#ff5d7a,#ff2d6f);
+    border-radius:50%;
+}
+.heart::before{transform:translate(-50%,0)}
+.heart::after{transform:translate(0,-50%)}
+@keyframes floatUp{
+    0%{transform:translate(var(--x,0),80vh) scale(0.6) rotate(45deg);opacity:0}
+    10%{opacity:1}
+    100%{transform:translate(var(--x-end, -8vw), -120vh) scale(1.1) rotate(45deg);opacity:0}
+}
+
+/* Confetti */
+.confetti{position:absolute;inset:0;pointer-events:none;overflow:visible}
+.confetti .piece{
+    position:absolute;width:10px;height:16px;opacity:0;transform-origin:center;
+    animation:confettiFall linear forwards;
+    border-radius:2px;
+}
+@keyframes confettiFall{
+    0%{opacity:1;transform:translateY(-20vh) rotate(0) scale(1)}
+    100%{opacity:1;transform:translateY(140vh) rotate(720deg) scale(.9)}
+}
+
+/* Modal / reveal */
+.reveal{
+    position:fixed;inset:0;display:grid;place-items:center;background:rgba(0,0,0,0.36);
+    opacity:0;pointer-events:none;transition:opacity .25s ease;
+}
+.reveal.open{opacity:1;pointer-events:auto}
+.popup{
+    background:linear-gradient(180deg,#fff, #fff8);padding:1.6rem;border-radius:14px;max-width:420px;width:92%;
+    text-align:center;box-shadow:0 20px 50px rgba(0,0,0,0.28);
+    transform:translateY(10px);transition:transform .28s ease;
+}
+.reveal.open .popup{transform:translateY(0)}
+.ring{
+    width:84px;height:84px;border-radius:50%;margin:0.8rem auto;background:conic-gradient(#ffd36b,#ffb3b3 50%,#ffd36b);
+    display:grid;place-items:center;box-shadow:inset 0 -6px 12px rgba(0,0,0,0.06);
+}
+.ring::after{
+    content:"";width:42px;height:28px;background:#fff;border-radius:6px 6px 14px 14px;transform:rotate(-20deg);display:block;
+}
+
+/* Responsive tweaks */
+@media (max-width:420px){
+    .card{padding:1.4rem;border-radius:16px}
+    .ring{width:68px;height:68px}
+}
