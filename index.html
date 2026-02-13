@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Will You Be Mine?</title>
+    <style>
+        :root{
+            --bg1:#ff9a9e; --bg2:#fad0c4; --accent:#ff6b6b; --card:#ffffffee;
+            --glass: rgba(255,255,255,0.12);
+        }
+        *{box-sizing:border-box;margin:0;padding:0}
+        html,body{height:100%}
+        body{
+            font-family: system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
+            background: linear-gradient(135deg,var(--bg1),var(--bg2));
+            display:flex;align-items:center;justify-content:center;
+            padding:2rem;
+            overflow:hidden;
+            color:#3a2b2b;
+        }
+
+        /* Card */
+        .card{
+            width:min(720px,96vw);
+            background:linear-gradient(180deg,var(--card),#fff);
+            border-radius:20px;
+            box-shadow:0 10px 30px rgba(0,0,0,0.12);
+            padding:2.2rem;
+            text-align:center;
+            position:relative;
+            overflow:hidden;
+            backdrop-filter: blur(6px);
+        }
+
+        h1{
+            font-size: clamp(1.6rem, 4.5vw, 2.4rem);
+            margin-bottom:.25rem;
+            letter-spacing:0.6px;
+        }
+        p.lead{
+            color:#6b4545;
+            margin-bottom:1.2rem;
+            font-size: clamp(.9rem,2.4vw,1.05rem);
+        }
+
+        /* Buttons */
+        .btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
+        button{
+            padding:.7rem 1.2rem;border-radius:12px;border:0;cursor:pointer;
+            font-weight:600;font-size:1rem;
+            transition:transform .18s ease, box-shadow .18s ease;
+            box-shadow:0 6px 18px rgba(0,0,0,0.08);
+            backdrop-filter: blur(4px);
+        }
+        .btn-yes{
+            background:linear-gradient(90deg,#ff7aa2,#ff517e);
+            color:white;
+        }
+        .btn-no{
+            background:transparent;border:2px solid rgba(58,43,43,0.12);
+            color:#6b4545;
+        }
+        button:active{transform:translateY(2px)}
+        .btn-no:hover{transform:translateY(-6px) rotate(-6deg) scale(1.02)}
+
+        /* Heart floats */
+        .hearts{
+            pointer-events:none;
+            position:absolute;inset:0;
+            overflow:hidden;
+        }
+        .heart{
+            position:absolute;
+            width:36px;height:36px;
+            transform:rotate(45deg);
+            left:50%;
+            top:50%;
+            opacity:0;
+            animation:floatUp linear infinite;
+        }
+        .heart::before,.heart::after{
+            content:"";position:absolute;width:100%;height:100%;
+            background:radial-gradient(circle at 30% 30%,#fff7,transparent 40%),linear-gradient(135deg,#ff5d7a,#ff2d6f);
+            border-radius:50%;
+        }
+        .heart::before{transform:translate(-50%,0)}
+        .heart::after{transform:translate(0,-50%)}
+        @keyframes floatUp{
+            0%{transform:translate(var(--x,0),80vh) scale(0.6) rotate(45deg);opacity:0}
+            10%{opacity:1}
+            100%{transform:translate(var(--x-end, -8vw), -120vh) scale(1.1) rotate(45deg);opacity:0}
+        }
+
+        /* Confetti */
+        .confetti{position:absolute;inset:0;pointer-events:none;overflow:visible}
+        .confetti .piece{
+            position:absolute;width:10px;height:16px;opacity:0;transform-origin:center;
+            animation:confettiFall linear forwards;
+            border-radius:2px;
+        }
+        @keyframes confettiFall{
+            0%{opacity:1;transform:translateY(-20vh) rotate(0) scale(1)}
+            100%{opacity:1;transform:translateY(140vh) rotate(720deg) scale(.9)}
+        }
+
+        /* Modal / reveal */
+        .reveal{
+            position:fixed;inset:0;display:grid;place-items:center;background:rgba(0,0,0,0.36);
+            opacity:0;pointer-events:none;transition:opacity .25s ease;
+        }
+        .reveal.open{opacity:1;pointer-events:auto}
+        .popup{
+            background:linear-gradient(180deg,#fff, #fff8);padding:1.6rem;border-radius:14px;max-width:420px;width:92%;
+            text-align:center;box-shadow:0 20px 50px rgba(0,0,0,0.28);
+            transform:translateY(10px);transition:transform .28s ease;
+        }
+        .reveal.open .popup{transform:translateY(0)}
+        .ring{
+            width:84px;height:84px;border-radius:50%;margin:0.8rem auto;background:conic-gradient(#ffd36b,#ffb3b3 50%,#ffd36b);
+            display:grid;place-items:center;box-shadow:inset 0 -6px 12px rgba(0,0,0,0.06);
+        }
+        .ring::after{
+            content:"";width:42px;height:28px;background:#fff;border-radius:6px 6px 14px 14px;transform:rotate(-20deg);display:block;
+        }
+
+        /* Responsive tweaks */
+        @media (max-width:420px){
+            .card{padding:1.4rem;border-radius:16px}
+            .ring{width:68px;height:68px}
+        }
+    </style>
+</head>
+<body>
+    <div class="card" role="main" aria-labelledby="title">
+        <div class="hearts" id="hearts"></div>
+        <h1 id="title">Will you be mine?</h1>
+        <p class="lead">I made this just for you — something small, warm, and true. Say yes and let's start our forever.</p>
+        <div class="btns">
+            <button class="btn-yes" id="yes">Yes ❤️</button>
+            <button class="btn-no" id="no">Maybe later</button>
+        </div>
+        <div style="margin-top:1rem;font-size:.85rem;color:#775454">Tap "Yes" to celebrate • "Maybe later" is part of the fun</div>
+    </div>
+
+    <div class="confetti" id="confetti"></div>
+
+    <div class="reveal" id="reveal" aria-hidden="true">
+        <div class="popup" role="dialog" aria-modal="true">
+            <div class="ring" aria-hidden="true"></div>
+            <h2>Yes! 💍</h2>
+            <p style="color:#5b3b3b">You made me the happiest. Let's make every day special.</p>
+            <div style="margin-top:1rem">
+                <button class="btn-yes" id="close">Hug</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Floating hearts generator
+        const heartsContainer = document.getElementById('hearts');
+        function spawnHeart(){
+            const h = document.createElement('div');
+            h.className = 'heart';
+            const size = Math.random()*28 + 18;
+            h.style.width = h.style.height = size + 'px';
+            const startX = (Math.random()*100 - 50) + 'vw';
+            h.style.setProperty('--x', startX);
+            h.style.setProperty('--x-end', (Math.random()*40 - 20) + 'vw');
+            h.style.left = (Math.random()*100) + '%';
+            h.style.top = (80 + Math.random()*20) + '%';
+            h.style.animationDuration = (6 + Math.random()*6) + 's';
+            h.style.opacity = '0';
+            heartsContainer.appendChild(h);
+            setTimeout(()=> h.remove(), 14000);
+        }
+        // keep a soft ambient of hearts
+        setInterval(spawnHeart, 800);
+        for(let i=0;i<6;i++) setTimeout(spawnHeart, i*350);
+
+        // Confetti on accept
+        const confetti = document.getElementById('confetti');
+        function burstConfetti(){
+            confetti.innerHTML = '';
+            const colours = ['#ff4d6d','#ffd76b','#6effc3','#8ec4ff','#ffb3d1'];
+            const count = 36;
+            for(let i=0;i<count;i++){
+                const piece = document.createElement('div');
+                piece.className = 'piece';
+                piece.style.left = Math.random()*100 + '%';
+                piece.style.top = (Math.random()*10 - 10) + 'vh';
+                piece.style.background = colours[i%colours.length];
+                piece.style.transform = `rotate(${Math.random()*360}deg)`;
+                piece.style.animationDuration = (1.2 + Math.random()*1.2) + 's';
+                piece.style.animationDelay = (Math.random()*0.12) + 's';
+                confetti.appendChild(piece);
+            }
+            // remove after animation
+            setTimeout(()=> confetti.innerHTML='',3000);
+        }
+
+        // Buttons behavior
+        const yesBtn = document.getElementById('yes');
+        const noBtn = document.getElementById('no');
+        const reveal = document.getElementById('reveal');
+        const closeBtn = document.getElementById('close');
+
+        yesBtn.addEventListener('click',()=>{
+            burstConfetti();
+            reveal.classList.add('open');
+            reveal.setAttribute('aria-hidden','false');
+            // a few more hearts burst
+            for(let i=0;i<12;i++) setTimeout(spawnHeart, i*80);
+        });
+
+        closeBtn.addEventListener('click',()=>{
+            reveal.classList.remove('open');
+            reveal.setAttribute('aria-hidden','true');
+        });
+
+        // Playful "no" behavior (moves away)
+        noBtn.addEventListener('mouseenter',()=>{
+            const dx = (Math.random()*60 - 30);
+            const dy = (Math.random()*18 - 9);
+            noBtn.style.transform = `translate(${dx}px, ${dy}px) rotate(${dx/6}deg)`;
+        });
+        noBtn.addEventListener('click',()=>{
+            // gentle nudge hearts and show friendly text change
+            const lead = document.querySelector('.lead');
+            lead.textContent = "It's okay — take your time. I'll be here.";
+            noBtn.disabled = true;
+            noBtn.textContent = "Soon?";
+            setTimeout(()=>{ noBtn.disabled = false; noBtn.textContent = "Maybe later"; lead.textContent = "I made this just for you — something small, warm, and true. Say yes and let's start our forever."; },3000);
+        });
+
+        // Accessibility: keyboard yes via Enter when focused
+        yesBtn.addEventListener('keydown', e => { if(e.key === 'Enter') yesBtn.click(); });
+        noBtn.addEventListener('keydown', e => { if(e.key === 'Enter') noBtn.click(); });
+    </script>
+</body>
+</html>
